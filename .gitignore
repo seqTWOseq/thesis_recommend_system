@@ -1,0 +1,24 @@
+# 대용량 데이터 파일
+data_pipeline/raw_data/
+data_pipeline/processed_data/
+
+# Vector DB 인덱스
+backend/vector_store/
+
+# Python
+__pycache__/
+*.py[cod]
+*.env
+.venv/
+venv/
+*.egg-info/
+
+# Node.js
+frontend/node_modules/
+frontend/.env
+frontend/build/
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db

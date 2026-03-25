@@ -3,7 +3,6 @@ uvicorn
 langchain
 langchain-community
 sentence-transformers
-faiss-cpu
 chromadb
 pandas
 python-dotenv

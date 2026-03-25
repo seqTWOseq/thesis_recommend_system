@@ -2,16 +2,29 @@ import React from "react";
 
 function ArticleList({ articles }) {
   if (!articles || articles.length === 0) {
-    return <p>검색 결과가 없습니다.</p>;
+    return (
+      <p className="text-[#374151]/70 text-sm sm:text-base text-center">
+        검색 결과가 없습니다.
+      </p>
+    );
   }
 
   return (
-    <ul style={{ listStyle: "none", padding: 0 }}>
+    <ul className="w-full">
       {articles.map((article, idx) => (
-        <li key={idx} style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "1rem", marginBottom: "0.75rem" }}>
-          <h3 style={{ margin: "0 0 0.5rem" }}>{article.title}</h3>
-          <p style={{ margin: "0 0 0.5rem", color: "#555" }}>{article.abstract}</p>
-          <span style={{ fontSize: "0.85rem", color: "#888" }}>유사도: {article.score}</span>
+        <li
+          key={idx}
+          className="mb-3 last:mb-0 rounded-xl border border-[#E5E7EB] bg-white/70 p-4 shadow-sm"
+        >
+          <h3 className="font-semibold text-[#374151] text-base sm:text-lg">
+            {article.title}
+          </h3>
+          <p className="text-[#6B7280] text-sm sm:text-[0.95rem] mt-2">
+            {article.abstract}
+          </p>
+          <span className="text-sm text-[#8DA399] inline-block mt-3">
+            유사도: {article.score}
+          </span>
         </li>
       ))}
     </ul>

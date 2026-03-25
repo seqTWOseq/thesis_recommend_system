@@ -1,4 +1,4 @@
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 // 백엔드 서버가 없을 때 사용할 Mock 데이터
 const MOCK_RESULTS = {

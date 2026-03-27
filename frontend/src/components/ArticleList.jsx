@@ -20,11 +20,23 @@ function ArticleList({ articles }) {
             {article.title}
           </h3>
           <p className="text-[#6B7280] text-sm sm:text-[0.95rem] mt-2">
-            {article.abstract}
+            {article.snippet || article.abstract}
           </p>
-          <span className="text-sm text-[#8DA399] inline-block mt-3">
-            유사도: {article.score}
-          </span>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <span className="text-sm text-[#8DA399] inline-block">
+              유사도: {article.score}
+            </span>
+            {article.url ? (
+              <a
+                href={article.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-[#4F46E5] hover:underline"
+              >
+                원문 보기
+              </a>
+            ) : null}
+          </div>
         </li>
       ))}
     </ul>

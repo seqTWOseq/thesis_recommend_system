@@ -10,9 +10,10 @@ from api.routes import router
 import chromadb
 from chromadb.api.models.Collection import Collection
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-PERSIST_DIR = Path(os.path.join(BASE_DIR, "backend", "vector_store"))
+CURRENT_DIR = Path(__file__).resolve().parent
+PERSIST_DIR = CURRENT_DIR / "vector_store"
 COLLECTION_NAME = "papers"
+print(f"ChromaDB 경로: {PERSIST_DIR.absolute()}")
 
 def initialize(app: FastAPI):
     """서버 시작 시 임베딩 모델과 ChromaDB 컬렉션을 로드합니다."""

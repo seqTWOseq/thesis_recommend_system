@@ -19,7 +19,11 @@ export default function App() {
   };
 
   return (
-    <MainLayout onSearch={handleSearch} backgroundImageUrl={testImageUrl}>
+    <MainLayout
+      onSearch={handleSearch}
+      loading={loading}
+      backgroundImageUrl={testImageUrl}
+    >
       <div className="w-full max-w-3xl">
         {loading ? (
           <p className="text-[#374151] text-sm sm:text-base mt-3 text-center opacity-70">

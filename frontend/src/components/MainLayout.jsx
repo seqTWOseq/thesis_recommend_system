@@ -1,7 +1,7 @@
 import React from "react";
 import SearchBar from "./SearchBar";
 
-function MainLayout({ onSearch, backgroundImageUrl, children }) {
+function MainLayout({ onSearch, loading = false, backgroundImageUrl, children }) {
   const backgroundStyle = backgroundImageUrl
     ? { backgroundImage: `url(${backgroundImageUrl})` }
     : undefined;
@@ -33,7 +33,7 @@ function MainLayout({ onSearch, backgroundImageUrl, children }) {
       {/* Search bar is anchored to the screen center (50vh boundary) */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-4">
         <div className="flex justify-center">
-          <SearchBar onSearch={onSearch} />
+          <SearchBar onSearch={onSearch} loading={loading} />
         </div>
       </div>
     </main>

@@ -13,56 +13,44 @@ body {
   color: #374151;
 }
 
-@property --search-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes search-shell-rotate {
+@keyframes search-loading-wave {
   0% {
-    --search-angle: 0deg;
+    background-position: 0% 50%;
   }
   100% {
-    --search-angle: 360deg;
+    background-position: 100% 50%;
   }
 }
 
-@keyframes search-shell-soft-glow {
-  0% {
-    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.12);
-  }
-  50% {
-    box-shadow: 0 5px 14px rgba(66, 133, 244, 0.2);
-  }
-  100% {
-    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.12);
-  }
-}
-
-.search-shell-loading {
-  --search-angle: 0deg;
-  border: 3px solid transparent;
+.search-bar-rainbow-ring {
+  position: relative;
   border-radius: 9999px;
-  background:
-    linear-gradient(#ffffff, #ffffff) padding-box,
-    conic-gradient(
-      from var(--search-angle),
-    rgba(0, 0, 0, 0) 0deg,
-    rgba(0, 0, 0, 0) 300deg,
-    #4285f4 322deg,
-    #34a853 336deg,
-    #fbbc05 348deg,
-    #ea4335 357deg,
-    rgba(0, 0, 0, 0) 360deg
-    ) border-box;
-  animation:
-    search-shell-rotate 1.55s linear infinite,
-    search-shell-soft-glow 2.4s linear infinite;
+  padding: 2px;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    #ff3232 0%,
+    #ff9900 8.33%,
+    #ffcc00 16.66%,
+    #33cc33 25%,
+    #3399ff 33.33%,
+    #9933ff 41.66%,
+    #ff3232 50%,
+    #ff9900 58.33%,
+    #ffcc00 66.66%,
+    #33cc33 75%,
+    #3399ff 83.33%,
+    #9933ff 91.66%,
+    #ff3232 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: search-loading-wave 3s linear infinite;
 }
 
-.search-shell-loading > * {
+.search-bar-rainbow-inner {
   position: relative;
   z-index: 1;
+  border-radius: 9999px;
+  background: #ffffff;
 }
-

@@ -1,7 +1,14 @@
 import React from "react";
 import SearchBar from "./SearchBar";
 
-function MainLayout({ onSearch, backgroundImageUrl, children, searchLoading = false }) {
+function MainLayout({
+  onSearch,
+  backgroundImageUrl,
+  children,
+  searchLoading = false,
+  searchError = null,
+  onDismissSearchError,
+}) {
   const backgroundStyle = backgroundImageUrl
     ? { backgroundImage: `url(${backgroundImageUrl})` }
     : undefined;
@@ -36,7 +43,12 @@ function MainLayout({ onSearch, backgroundImageUrl, children, searchLoading = fa
           <h1 className="absolute -top-[74px] left-1/2 -translate-x-1/2 text-3xl sm:text-4xl font-semibold tracking-tight text-[#355548]">
             Find Thesis
           </h1>
-          <SearchBar onSearch={onSearch} loading={searchLoading} />
+          <SearchBar
+            onSearch={onSearch}
+            loading={searchLoading}
+            apiError={searchError}
+            onDismissApiError={onDismissSearchError}
+          />
         </div>
       </div>
     </main>

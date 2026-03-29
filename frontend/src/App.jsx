@@ -9,6 +9,7 @@ export default function App() {
   const [searchText, setSearchText] = useState(window.location.search);
   const [routeState, setRouteState] = useState(window.history.state || {});
   const [homeLoading, setHomeLoading] = useState(false);
+  const [homeSearchError, setHomeSearchError] = useState(null);
 
   useEffect(() => {
     const onPopState = (event) => {
@@ -23,25 +24,33 @@ export default function App() {
 
   const handleSearchNavigation = async (query) => {
     const next = query.trim();
-    if (!next) return;
+    if (!next) return { ok: false };
 
     const shouldShowHomeLoading = path !== "/search";
     if (shouldShowHomeLoading) {
+      setHomeSearchError(null);
       setHomeLoading(true);
     }
 
     try {
       const data = await searchPapers(next, 100);
-      const nextResults = data?.results || [];
+      if (!data.ok) {
+        if (shouldShowHomeLoading) {
+          setHomeSearchError(data.userMessage);
+        }
+        return { ok: false, userMessage: data.userMessage };
+      }
+
       const nextState = {
         prefetchedQuery: next,
-        prefetchedResults: nextResults,
+        prefetchedResults: data.results || [],
       };
       const nextUrl = `/search?q=${encodeURIComponent(next)}`;
       window.history.pushState(nextState, "", nextUrl);
       setRouteState(nextState);
       setPath("/search");
       setSearchText(window.location.search);
+      return { ok: true };
     } finally {
       if (shouldShowHomeLoading) {
         setHomeLoading(false);
@@ -70,6 +79,8 @@ export default function App() {
       onSearch={handleSearchNavigation}
       backgroundImageUrl={testImageUrl}
       searchLoading={homeLoading}
+      searchError={homeSearchError}
+      onDismissSearchError={() => setHomeSearchError(null)}
     />
   );
 }

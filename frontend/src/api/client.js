@@ -1,24 +1,40 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+import axios from "axios";
 
-// 백엔드 서버가 없을 때 사용할 Mock 데이터
-const MOCK_RESULTS = {
-  results: [
-    { title: "Mock Paper 1", abstract: "This is a mock abstract for testing.", score: 0.98 },
-    { title: "Mock Paper 2", abstract: "Another mock abstract for UI development.", score: 0.91 },
-  ],
-};
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const apiClient = axios.create({
+  baseURL: BASE_URL,
+  timeout: 5000,
+});
 
 export async function fetchRecommendations(query) {
+  return searchPapers(query, 5);
+}
+
+export async function searchPapers(query, topK = 100) {
   try {
-    const response = await fetch(`${BASE_URL}/recommend`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query }),
-    });
-    if (!response.ok) throw new Error("API error");
-    return await response.json();
+    const response = await apiClient.post("/api/search", { query, top_k: topK });
+    const results = response?.data?.results || [];
+    return { ok: true, results };
   } catch (error) {
-    console.warn("백엔드 연결 실패 - Mock 데이터 사용:", error.message);
-    return MOCK_RESULTS;
+    if (axios.isAxiosError(error)) {
+      if (
+        error.code === "ERR_NETWORK" ||
+        error.code === "ECONNABORTED" ||
+        !error.response
+      ) {
+        return {
+          ok: false,
+          userMessage: "Network error. Please check your connection.",
+        };
+      }
+      return {
+        ok: false,
+        userMessage: "Search failed. Please try again.",
+      };
+    }
+    return {
+      ok: false,
+      userMessage: "Search failed. Please try again.",
+    };
   }
 }

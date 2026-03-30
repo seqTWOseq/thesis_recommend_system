@@ -1,37 +1,87 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import MainLayout from "./components/MainLayout";
-import ArticleList from "./components/ArticleList";
-import { fetchRecommendations } from "./api/client";
+import SearchResultsPage from "./components/SearchResultsPage";
+import { searchPapers } from "./api/client";
 import testImageUrl from "../img/test.png";
 
 export default function App() {
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [path, setPath] = useState(window.location.pathname);
+  const [searchText, setSearchText] = useState(window.location.search);
+  const [routeState, setRouteState] = useState(window.history.state || {});
+  const [homeLoading, setHomeLoading] = useState(false);
+  const [homeSearchError, setHomeSearchError] = useState(null);
 
-  const handleSearch = async (query) => {
-    setLoading(true);
+  useEffect(() => {
+    const onPopState = (event) => {
+      setPath(window.location.pathname);
+      setSearchText(window.location.search);
+      setRouteState(event.state || {});
+    };
+
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  const handleSearchNavigation = async (query) => {
+    const next = query.trim();
+    if (!next) return { ok: false };
+
+    const shouldShowHomeLoading = path !== "/search";
+    if (shouldShowHomeLoading) {
+      setHomeSearchError(null);
+      setHomeLoading(true);
+    }
+
     try {
-      const data = await fetchRecommendations(query);
-      setResults(data.results || []);
+      const data = await searchPapers(next, 100);
+      if (!data.ok) {
+        if (shouldShowHomeLoading) {
+          setHomeSearchError(data.userMessage);
+        }
+        return { ok: false, userMessage: data.userMessage };
+      }
+
+      const nextState = {
+        prefetchedQuery: next,
+        prefetchedResults: data.results || [],
+      };
+      const nextUrl = `/search?q=${encodeURIComponent(next)}`;
+      window.history.pushState(nextState, "", nextUrl);
+      setRouteState(nextState);
+      setPath("/search");
+      setSearchText(window.location.search);
+      return { ok: true };
     } finally {
-      setLoading(false);
+      if (shouldShowHomeLoading) {
+        setHomeLoading(false);
+      }
     }
   };
 
+  const queryFromUrl = useMemo(() => {
+    const params = new URLSearchParams(searchText);
+    return params.get("q") || "";
+  }, [searchText]);
+
+  if (path === "/search") {
+    return (
+      <SearchResultsPage
+        initialQuery={queryFromUrl}
+        onSearch={handleSearchNavigation}
+        prefetchedQuery={routeState?.prefetchedQuery || ""}
+        prefetchedResults={routeState?.prefetchedResults}
+      />
+    );
+  }
+
   return (
-    <MainLayout onSearch={handleSearch} backgroundImageUrl={testImageUrl}>
-      <div className="w-full max-w-3xl">
-        {loading ? (
-          <p className="text-[#374151] text-sm sm:text-base mt-3 text-center opacity-70">
-            검색 중...
-          </p>
-        ) : results?.length ? (
-          <div className="mt-4 max-h-[24vh] overflow-auto pr-1">
-            <ArticleList articles={results} />
-          </div>
-        ) : null}
-      </div>
-    </MainLayout>
+    <MainLayout
+      onSearch={handleSearchNavigation}
+      backgroundImageUrl={testImageUrl}
+      searchLoading={homeLoading}
+      searchError={homeSearchError}
+      onDismissSearchError={() => setHomeSearchError(null)}
+    />
   );
 }
 

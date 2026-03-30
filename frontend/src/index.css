@@ -13,3 +13,44 @@ body {
   color: #374151;
 }
 
+@keyframes search-loading-wave {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.search-bar-rainbow-ring {
+  position: relative;
+  border-radius: 9999px;
+  padding: 2px;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    #ff3232 0%,
+    #ff9900 8.33%,
+    #ffcc00 16.66%,
+    #33cc33 25%,
+    #3399ff 33.33%,
+    #9933ff 41.66%,
+    #ff3232 50%,
+    #ff9900 58.33%,
+    #ffcc00 66.66%,
+    #33cc33 75%,
+    #3399ff 83.33%,
+    #9933ff 91.66%,
+    #ff3232 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: search-loading-wave 3s linear infinite;
+}
+
+.search-bar-rainbow-inner {
+  position: relative;
+  z-index: 1;
+  border-radius: 9999px;
+  background: #ffffff;
+}

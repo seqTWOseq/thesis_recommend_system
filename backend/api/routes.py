@@ -31,6 +31,7 @@ class PaperResult(BaseModel):
     similarity: float
     categories: list[str]
     page_content: str
+    update_date: int | None = None
 
 
 class SearchResponse(BaseModel):

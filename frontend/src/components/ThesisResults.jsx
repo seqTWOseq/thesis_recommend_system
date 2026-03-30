@@ -1,4 +1,11 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 function parseTitleAbstract(pageContent) {
   const content = typeof pageContent === "string" ? pageContent : "";
@@ -18,7 +25,12 @@ function formatCategories(categories) {
   if (!Array.isArray(categories)) return "-";
   const tokens = categories
     .flatMap((chunk) =>
-      typeof chunk === "string" ? chunk.split(/\s+/).map((t) => t.trim()).filter(Boolean) : []
+      typeof chunk === "string"
+        ? chunk
+            .split(/\s+/)
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [],
     )
     .filter(Boolean);
   return tokens.length ? tokens.join(", ") : "-";
@@ -31,11 +43,33 @@ function formatSimilarity(similarity) {
 }
 
 function ResultItem({ item, variant = "list" }) {
-  const categoriesText = useMemo(() => formatCategories(item?.categories), [item]);
+  const categoriesText = useMemo(
+    () => formatCategories(item?.categories),
+    [item],
+  );
   const { title, abstract } = useMemo(
     () => parseTitleAbstract(item?.page_content),
-    [item?.page_content]
+    [item?.page_content],
   );
+
+  const formattedDate = useMemo(() => {
+    if (!item?.update_date) return "-";
+
+    // DB에서 넘어온 타임스탬프 값
+    let timestamp = item.update_date;
+
+    // 타임스탬프가 초 단위(10자리 이하, 대략 100억 미만)인지 확인하여 밀리초 단위로 변환
+    if (timestamp < 10000000000) {
+      timestamp = timestamp * 1000;
+    }
+
+    const date = new Date(timestamp);
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  }, [item?.update_date]);
 
   const isHighlight = variant === "highlight";
 
@@ -51,12 +85,22 @@ function ResultItem({ item, variant = "list" }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs text-[#6B7280]">
-            ID: <span className="font-medium text-[#374151]">{item?.id || "-"}</span>
+            ID:{" "}
+            <span className="font-medium text-[#374151]">
+              {item?.id || "-"}
+            </span>
+          </p>
+          <p className="text-xs text-[#6B7280] mt-1">
+            Date:{" "}
+            <span className="font-medium text-[#374151]">{formattedDate}</span>
           </p>
         </div>
         <div className="text-right">
           <p className="text-sm text-[#8DA399]">
-            Similarity: <span className="font-semibold text-[#355548]">{formatSimilarity(item?.similarity)}</span>
+            Similarity:{" "}
+            <span className="font-semibold text-[#355548]">
+              {formatSimilarity(item?.similarity)}
+            </span>
           </p>
           <p className="text-xs text-[#6B7280]">{categoriesText}</p>
         </div>
@@ -64,14 +108,23 @@ function ResultItem({ item, variant = "list" }) {
 
       <div className="mt-3 space-y-3">
         <div>
-          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">Title</p>
-          <h3 className={"mt-1 font-semibold text-[#374151] " + (isHighlight ? "text-base sm:text-lg" : "text-base")}>
+          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
+            Title
+          </p>
+          <h3
+            className={
+              "mt-1 font-semibold text-[#374151] " +
+              (isHighlight ? "text-base sm:text-lg" : "text-base")
+            }
+          >
             {title}
           </h3>
         </div>
 
         <div>
-          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">Abstract</p>
+          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
+            Abstract
+          </p>
           <p className="mt-1 text-sm text-[#6B7280] whitespace-pre-line break-words">
             {abstract}
           </p>
@@ -136,7 +189,7 @@ function ResultList({ items }) {
         guardRef.current = true;
         loadMore();
       },
-      { root: null, threshold: 0.01 }
+      { root: null, threshold: 0.01 },
     );
 
     observer.observe(el);
@@ -176,14 +229,12 @@ function ResultList({ items }) {
         ))}
       </ul>
 
-      <div
-        ref={sentinelRef}
-        className="h-2"
-        aria-hidden="true"
-      />
+      <div ref={sentinelRef} className="h-2" aria-hidden="true" />
 
       {!canLoadMore ? (
-        <p className="mt-3 text-xs text-[#6B7280] text-center">더 이상 결과가 없습니다.</p>
+        <p className="mt-3 text-xs text-[#6B7280] text-center">
+          더 이상 결과가 없습니다.
+        </p>
       ) : null}
     </section>
   );
@@ -196,8 +247,10 @@ export default function ThesisResults({ results }) {
     const sorted = [...results].sort((a, b) => {
       const aScore = Number(a?.similarity);
       const bScore = Number(b?.similarity);
-      return (Number.isFinite(bScore) ? bScore : -Infinity) -
-        (Number.isFinite(aScore) ? aScore : -Infinity);
+      return (
+        (Number.isFinite(bScore) ? bScore : -Infinity) -
+        (Number.isFinite(aScore) ? aScore : -Infinity)
+      );
     });
     return sorted.slice(0, 100);
   }, [results]);
@@ -214,4 +267,3 @@ export default function ThesisResults({ results }) {
 }
 
 export { HighlightList, ResultList, ResultItem };
-

@@ -268,6 +268,10 @@ class SearchService:
             if not isinstance(page_content, str) or not page_content:
                 document_value = item.get("document", "")
                 page_content = document_value if isinstance(document_value, str) else ""
+                
+            update_date = item.get("update_date")
+            if update_date is None:
+                update_date = (item.get("metadata") or {}).get("update_date")
 
             formatted_results.append(
                 {
@@ -275,6 +279,7 @@ class SearchService:
                     "similarity": similarity,
                     "categories": self._normalize_categories(categories),
                     "page_content": page_content,
+                    "update_date": update_date,
                 }
             )
 

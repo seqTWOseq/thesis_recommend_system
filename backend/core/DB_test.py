@@ -99,7 +99,7 @@ class SearchService:
             return []
         
         print(f"[DEBUG] -------------------------------------------")
-        print(f"[DEBUG] 변환된 HyDE 쿼리 (영문 초록):")
+        print(f"[DEBUG] Generated HyDE Query:")
         print(f"{generated_query}")
         print(f"[DEBUG] -------------------------------------------")
 

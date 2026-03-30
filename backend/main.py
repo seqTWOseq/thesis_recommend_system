@@ -35,7 +35,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # Dev 환경에서 프론트 주소가 `localhost`/`127.0.0.1`/포트에 따라 달라질 수 있어
+    # 브라우저 CORS 차단으로 인한 "Network error"를 줄이기 위해 허용 범위를 확장합니다.
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origin_regex=r"^http://(localhost|127\.0\.0\.1):\d+$",
     allow_methods=["*"],
     allow_headers=["*"],
 )

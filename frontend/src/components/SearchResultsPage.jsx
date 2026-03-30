@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import SearchBar from "./SearchBar";
-import ArticleList from "./ArticleList";
+import ThesisResults from "./ThesisResults";
 import { searchPapers } from "../api/client";
 
 function SearchResultsPage({
@@ -115,7 +115,7 @@ function SearchResultsPage({
               <span className="text-sm opacity-80">Loading results…</span>
             </div>
           ) : (
-            <ArticleList articles={results} />
+            <ThesisResults results={results} />
           )}
         </div>
       </section>

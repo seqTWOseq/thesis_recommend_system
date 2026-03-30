@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import MainLayout from "./components/MainLayout";
 import SearchResultsPage from "./components/SearchResultsPage";
 import { searchPapers } from "./api/client";
-import testImageUrl from "../img/test.png";
+import thesisImageUrl from "../img/Thesis.jpg";
 
 export default function App() {
   const [path, setPath] = useState(window.location.pathname);
@@ -77,7 +77,7 @@ export default function App() {
   return (
     <MainLayout
       onSearch={handleSearchNavigation}
-      backgroundImageUrl={testImageUrl}
+      backgroundImageUrl={thesisImageUrl}
       searchLoading={homeLoading}
       searchError={homeSearchError}
       onDismissSearchError={() => setHomeSearchError(null)}

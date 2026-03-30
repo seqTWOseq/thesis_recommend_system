@@ -124,24 +124,30 @@ class SearchService:
     def _build_search_query(self, user_input: str) -> str:
         """사용자 입력을 HyDE용 영문 초록으로 생성합니다."""
         prompt_content = f"""
-당신은 HyDE 기반 학술 논문 검색을 돕는 도우미입니다.
-사용자는 한국어 또는 영어로 입력할 수 있습니다.
+### Role
+You are an expert academic researcher specialized in computer science and AI. 
+Your task is to transform a brief project description into a high-quality, professional English research abstract for a hypothetical paper.
 
-사용자의 프로젝트 설명을 짧은 영문 연구 초록으로 다시 작성하세요.
-조건:
-1. 영문 문장만 출력합니다.
-2. 2~3문장으로 작성합니다.
-3. 암시된 구체적인 방법, 모델, 기술 용어가 있으면 포함합니다.
-4. 글머리표, 라벨, 추가 설명은 출력하지 않습니다.
+### Constraints
+1. Language: Output ONLY English sentences. No Korean, no conversational fillers.
+2. Length: Exactly 2 to 3 sentences.
+3. Content: Focus on the technical methodology and expected outcomes.
+4. Formatting: Do not include titles, labels, bullets, or any additional explanation.
 
-예시 입력: 군중이 많은 영상 장면에서 이상행동을 탐지하는 시스템
-예시 출력: This paper presents a real-time video surveillance system for abnormal behavior detection in crowded environments. The approach combines spatiotemporal feature extraction with action recognition techniques to identify and classify anomalous human activities.
+### Examples
+Input: 군중이 많은 영상 장면에서 이상행동을 탐지하는 시스템
+Output: This paper presents a real-time video surveillance system for abnormal behavior detection in crowded environments. The approach combines spatiotemporal feature extraction with action recognition techniques to identify and classify anomalous human activities.
 
-예시 입력: 최적의 대중교통 경로를 추천하는 서비스
-예시 출력: We propose an intelligent route recommendation system for public transportation networks. The method leverages graph-based optimization and reinforcement learning to generate time-efficient and cost-effective itineraries from dynamic transit data.
+Input: 최적의 대중교통 경로를 추천하는 서비스
+Output: We propose an intelligent route recommendation system for public transportation networks. The method leverages graph-based optimization and reinforcement learning to generate time-efficient and cost-effective itineraries from dynamic transit data.
 
-사용자 입력: {user_input}
-출력:
+Input: RAG를 활용하여 비정형 문서를 구조화된 표로 변환하는 시스템
+Output: This research introduces a Retrieval-Augmented Generation (RAG) framework designed to automate the transformation of unstructured documents into standardized tables. The system retrieves relevant schema templates and leverages large language models to ensure accurate data normalization and structural integrity.
+
+### User Input
+{user_input}
+
+### Output (English Abstract)
 """.strip()
 
         tokenizer = self.resources.hyde_tokenizer

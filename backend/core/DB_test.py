@@ -97,6 +97,11 @@ class SearchService:
         generated_query = self._build_search_query(normalized_input)
         if not generated_query:
             return []
+        
+        print(f"[DEBUG] -------------------------------------------")
+        print(f"[DEBUG] 변환된 HyDE 쿼리 (영문 초록):")
+        print(f"{generated_query}")
+        print(f"[DEBUG] -------------------------------------------")
 
         query_vector = self._create_query_vector(generated_query)
 

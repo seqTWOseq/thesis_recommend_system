@@ -33,7 +33,7 @@ function ArticleList({ articles }) {
                 rel="noreferrer"
                 className="text-sm text-[#4F46E5] hover:underline"
               >
-                원문 보기
+                {/* 원문 보기 */}
               </a>
             ) : null}
           </div>

@@ -52,7 +52,6 @@ function ResultItem({ item, variant = "list" }) {
     [item?.page_content],
   );
 
-
   const externalUrls = useMemo(() => {
     // Prefer explicit URL if provided
     if (item?.url && typeof item.url === "string") {
@@ -99,15 +98,72 @@ function ResultItem({ item, variant = "list" }) {
   }, [item?.update_date]);
 
   const isHighlight = variant === "highlight";
+  const primaryDocHref = externalUrls.pdf || externalUrls.view;
+  const hasHeaderLinks = Boolean(externalUrls.pdf || externalUrls.view);
+
+  const openInNewTab = useCallback((url) => {
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
+  }, []);
+
+  const openPrimaryDoc = useCallback(() => {
+    openInNewTab(primaryDocHref);
+  }, [primaryDocHref, openInNewTab]);
+
+  const onCardKeyDown = useCallback(
+    (e) => {
+      if (!primaryDocHref) return;
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openPrimaryDoc();
+      }
+    },
+    [primaryDocHref, openPrimaryDoc],
+  );
+
+  const titleAbstractBlock = (
+    <>
+      <div>
+        <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
+          Title
+        </p>
+        <div
+          className={
+            "mt-1 font-semibold text-[#374151] group-hover:underline " +
+            (isHighlight ? "text-base sm:text-lg" : "text-base")
+          }
+        >
+          {title}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
+          Abstract
+        </p>
+        <p className="mt-1 text-sm text-[#6B7280] whitespace-pre-line break-words">
+          {abstract}
+        </p>
+      </div>
+    </>
+  );
 
   return (
     <article
       className={
         "w-full rounded-xl border p-4 shadow-sm transition-colors " +
+        (primaryDocHref
+          ? "cursor-pointer outline-none transition-[background-color,box-shadow] hover:bg-[#355548]/[0.05] focus-visible:ring-2 focus-visible:ring-[#8DA399]/40 "
+          : "") +
+        (primaryDocHref ? "group " : "") +
         (isHighlight
           ? "border-[#8DA399]/50 bg-[#8DA399]/10"
           : "border-[#E5E7EB] bg-white/70")
       }
+      onClick={primaryDocHref ? openPrimaryDoc : undefined}
+      onKeyDown={primaryDocHref ? onCardKeyDown : undefined}
+      tabIndex={primaryDocHref ? 0 : undefined}
+      aria-label={primaryDocHref ? `원문 열기: ${title}` : undefined}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -130,69 +186,36 @@ function ResultItem({ item, variant = "list" }) {
             </span>
           </p>
           <p className="text-xs text-[#6B7280]">{categoriesText}</p>
-          {externalUrls.view ? (
+          {hasHeaderLinks ? (
             <div className="mt-2 flex justify-end gap-3">
-              <a
-                href={externalUrls.pdf || externalUrls.view}
-                target="_blank"
-                rel="noreferrer"
-                className="text-xs text-[#4F46E5] hover:underline"
+              <button
+                type="button"
+                className="cursor-pointer border-0 bg-transparent p-0 text-xs text-[#4F46E5] hover:underline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openInNewTab(externalUrls.pdf || externalUrls.view);
+                }}
               >
-                원문 보기
-              </a>
-              {externalUrls.pdf && (
-                <a
-                  href={externalUrls.view}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs text-[#4F46E5]/80 hover:underline"
+                {/* 원문 보기 */}
+              </button>
+              {externalUrls.pdf ? (
+                <button
+                  type="button"
+                  className="cursor-pointer border-0 bg-transparent p-0 text-xs text-[#4F46E5]/80 hover:underline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openInNewTab(externalUrls.view);
+                  }}
                 >
                   초록
-                </a>
-              )}
+                </button>
+              ) : null}
             </div>
           ) : null}
         </div>
       </div>
 
-      <div className="mt-3 space-y-3">
-        <div>
-          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
-            Title
-          </p>
-          {externalUrls.pdf || externalUrls.view ? (
-            <a
-              href={externalUrls.pdf || externalUrls.view}
-              target="_blank"
-              rel="noreferrer"
-              className={
-                "mt-1 inline-block font-semibold text-[#374151] hover:underline " +
-                (isHighlight ? "text-base sm:text-lg" : "text-base")
-              }
-            >
-              {title}
-            </a>
-          ) : (
-            <h3
-              className={
-                "mt-1 font-semibold text-[#374151] " +
-                (isHighlight ? "text-base sm:text-lg" : "text-base")
-              }
-            >
-              {title}
-            </h3>
-          )}
-        </div>
-
-        <div>
-          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
-            Abstract
-          </p>
-          <p className="mt-1 text-sm text-[#6B7280] whitespace-pre-line break-words">
-            {abstract}
-          </p>
-        </div>
-      </div>
+      <div className="mt-3 space-y-3">{titleAbstractBlock}</div>
     </article>
   );
 }

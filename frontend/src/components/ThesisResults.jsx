@@ -160,7 +160,6 @@ function ResultItem({ item, variant = "list" }) {
           <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
             Title
           </p>
-<<<<<<< HEAD
           {externalUrls.pdf || externalUrls.view ? (
             <a
               href={externalUrls.pdf || externalUrls.view}
@@ -183,16 +182,6 @@ function ResultItem({ item, variant = "list" }) {
               {title}
             </h3>
           )}
-=======
-          <h3
-            className={
-              "mt-1 font-semibold text-[#374151] " +
-              (isHighlight ? "text-base sm:text-lg" : "text-base")
-            }
-          >
-            {title}
-          </h3>
->>>>>>> main
         </div>
 
         <div>

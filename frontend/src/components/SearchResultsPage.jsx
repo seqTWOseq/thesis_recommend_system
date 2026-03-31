@@ -80,7 +80,7 @@ function SearchResultsPage({
   const barLoading = fetchLoading || submitLoading;
 
   return (
-    <main className="min-h-screen bg-[#F9F9F7] px-4 py-8">
+    <main className="min-h-screen bg-[#DBD3C7] px-4 py-8">
       <section className="w-full max-w-5xl mx-auto">
         <div className="w-full">
           <SearchBar

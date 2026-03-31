@@ -1,4 +1,11 @@
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 function parseTitleAbstract(pageContent) {
   const content = typeof pageContent === "string" ? pageContent : "";
@@ -18,7 +25,12 @@ function formatCategories(categories) {
   if (!Array.isArray(categories)) return "-";
   const tokens = categories
     .flatMap((chunk) =>
-      typeof chunk === "string" ? chunk.split(/\s+/).map((t) => t.trim()).filter(Boolean) : []
+      typeof chunk === "string"
+        ? chunk
+            .split(/\s+/)
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [],
     )
     .filter(Boolean);
   return tokens.length ? tokens.join(", ") : "-";
@@ -31,18 +43,66 @@ function formatSimilarity(similarity) {
 }
 
 function ResultItem({ item, variant = "list" }) {
-  const categoriesText = useMemo(() => formatCategories(item?.categories), [item]);
+  const categoriesText = useMemo(
+    () => formatCategories(item?.categories),
+    [item],
+  );
   const { title, abstract } = useMemo(
     () => parseTitleAbstract(item?.page_content),
-    [item?.page_content]
+    [item?.page_content],
   );
+
+  const externalUrls = useMemo(() => {
+    // Prefer explicit URL if provided
+    if (item?.url && typeof item.url === "string") {
+      return { view: item.url, pdf: null };
+    }
+
+    // Try to derive from arXiv id formats
+    const rawId = String(item?.id || "").trim();
+    if (!rawId) return { view: null, pdf: null };
+
+    // Accept common forms: "2006.04515", "2006.04515v2", "arXiv:2006.04515", "arXiv:2006.04515v2"
+    const arxivMatch =
+      rawId.match(/^arXiv:(?<core>\d{4}\.\d{4,5}(v\d+)?)$/i) ||
+      rawId.match(/^(?<core>\d{4}\.\d{4,5}(v\d+)?)$/);
+
+    if (arxivMatch?.groups?.core) {
+      const core = arxivMatch.groups.core;
+      return {
+        view: `https://arxiv.org/abs/${core}`,
+        pdf: `https://arxiv.org/pdf/${core}.pdf`,
+      };
+    }
+
+    return { view: null, pdf: null };
+  }, [item?.id, item?.url]);
+
+  const formattedDate = useMemo(() => {
+    if (!item?.update_date) return "-";
+
+    // DB에서 넘어온 타임스탬프 값
+    let timestamp = item.update_date;
+
+    // 타임스탬프가 초 단위(10자리 이하, 대략 100억 미만)인지 확인하여 밀리초 단위로 변환
+    if (timestamp < 10000000000) {
+      timestamp = timestamp * 1000;
+    }
+
+    const date = new Date(timestamp);
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  }, [item?.update_date]);
 
   const isHighlight = variant === "highlight";
 
   return (
     <article
       className={
-        "rounded-xl border p-4 shadow-sm transition-colors " +
+        "w-full rounded-xl border p-4 shadow-sm transition-colors " +
         (isHighlight
           ? "border-[#8DA399]/50 bg-[#8DA399]/10"
           : "border-[#E5E7EB] bg-white/70")
@@ -51,27 +111,82 @@ function ResultItem({ item, variant = "list" }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs text-[#6B7280]">
-            ID: <span className="font-medium text-[#374151]">{item?.id || "-"}</span>
+            ID:{" "}
+            <span className="font-medium text-[#374151]">
+              {item?.id || "-"}
+            </span>
+          </p>
+          <p className="text-xs text-[#6B7280] mt-1">
+            Date:{" "}
+            <span className="font-medium text-[#374151]">{formattedDate}</span>
           </p>
         </div>
         <div className="text-right">
           <p className="text-sm text-[#8DA399]">
-            Similarity: <span className="font-semibold text-[#355548]">{formatSimilarity(item?.similarity)}</span>
+            Similarity:{" "}
+            <span className="font-semibold text-[#355548]">
+              {formatSimilarity(item?.similarity)}
+            </span>
           </p>
           <p className="text-xs text-[#6B7280]">{categoriesText}</p>
+          {externalUrls.view ? (
+            <div className="mt-2 flex justify-end gap-3">
+              <a
+                href={externalUrls.pdf || externalUrls.view}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-[#4F46E5] hover:underline"
+              >
+                원문 보기
+              </a>
+              {externalUrls.pdf && (
+                <a
+                  href={externalUrls.view}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-[#4F46E5]/80 hover:underline"
+                >
+                  초록
+                </a>
+              )}
+            </div>
+          ) : null}
         </div>
       </div>
 
       <div className="mt-3 space-y-3">
         <div>
-          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">Title</p>
-          <h3 className={"mt-1 font-semibold text-[#374151] " + (isHighlight ? "text-base sm:text-lg" : "text-base")}>
-            {title}
-          </h3>
+          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
+            Title
+          </p>
+          {externalUrls.pdf || externalUrls.view ? (
+            <a
+              href={externalUrls.pdf || externalUrls.view}
+              target="_blank"
+              rel="noreferrer"
+              className={
+                "mt-1 inline-block font-semibold text-[#374151] hover:underline " +
+                (isHighlight ? "text-base sm:text-lg" : "text-base")
+              }
+            >
+              {title}
+            </a>
+          ) : (
+            <h3
+              className={
+                "mt-1 font-semibold text-[#374151] " +
+                (isHighlight ? "text-base sm:text-lg" : "text-base")
+              }
+            >
+              {title}
+            </h3>
+          )}
         </div>
 
         <div>
-          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">Abstract</p>
+          <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
+            Abstract
+          </p>
           <p className="mt-1 text-sm text-[#6B7280] whitespace-pre-line break-words">
             {abstract}
           </p>
@@ -98,7 +213,7 @@ function HighlightList({ items }) {
         <p className="text-sm font-semibold text-[#355548]">Top 5</p>
         <p className="text-xs text-[#6B7280]">유사도 상위 5개 결과</p>
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="flex w-full flex-col gap-3">
         {items.map((item) => (
           <MemoResultItem key={item?.id} item={item} variant="highlight" />
         ))}
@@ -136,7 +251,7 @@ function ResultList({ items }) {
         guardRef.current = true;
         loadMore();
       },
-      { root: null, threshold: 0.01 }
+      { root: null, threshold: 0.01 },
     );
 
     observer.observe(el);
@@ -176,14 +291,12 @@ function ResultList({ items }) {
         ))}
       </ul>
 
-      <div
-        ref={sentinelRef}
-        className="h-2"
-        aria-hidden="true"
-      />
+      <div ref={sentinelRef} className="h-2" aria-hidden="true" />
 
       {!canLoadMore ? (
-        <p className="mt-3 text-xs text-[#6B7280] text-center">더 이상 결과가 없습니다.</p>
+        <p className="mt-3 text-xs text-[#6B7280] text-center">
+          더 이상 결과가 없습니다.
+        </p>
       ) : null}
     </section>
   );
@@ -196,8 +309,10 @@ export default function ThesisResults({ results }) {
     const sorted = [...results].sort((a, b) => {
       const aScore = Number(a?.similarity);
       const bScore = Number(b?.similarity);
-      return (Number.isFinite(bScore) ? bScore : -Infinity) -
-        (Number.isFinite(aScore) ? aScore : -Infinity);
+      return (
+        (Number.isFinite(bScore) ? bScore : -Infinity) -
+        (Number.isFinite(aScore) ? aScore : -Infinity)
+      );
     });
     return sorted.slice(0, 100);
   }, [results]);
@@ -214,4 +329,3 @@ export default function ThesisResults({ results }) {
 }
 
 export { HighlightList, ResultList, ResultItem };
-

@@ -77,7 +77,7 @@ export default function App() {
   return (
     <MainLayout
       onSearch={handleSearchNavigation}
-      backgroundImageUrl={thesisImageUrl}
+      // backgroundImageUrl={thesisImageUrl}
       searchLoading={homeLoading}
       searchError={homeSearchError}
       onDismissSearchError={() => setHomeSearchError(null)}

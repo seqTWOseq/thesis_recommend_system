@@ -57,7 +57,7 @@ function SearchBar({
         type="text"
         value={query}
         onChange={handleChange}
-        placeholder="찾으시는 논문의 제목이나 키워드를 입력하세요..."
+        placeholder="찾으시는 논문의 주제를 입력하세요..."
         className="flex-1 bg-transparent text-[#374151] placeholder:text-[#8DA399] outline-none rounded-full px-4 py-2 text-base sm:text-lg"
         aria-invalid={displayError ? "true" : "false"}
         aria-describedby={displayError ? `${id}-error` : undefined}

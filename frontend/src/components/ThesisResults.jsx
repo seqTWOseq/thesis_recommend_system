@@ -52,6 +52,33 @@ function ResultItem({ item, variant = "list" }) {
     [item?.page_content],
   );
 
+
+  const externalUrls = useMemo(() => {
+    // Prefer explicit URL if provided
+    if (item?.url && typeof item.url === "string") {
+      return { view: item.url, pdf: null };
+    }
+
+    // Try to derive from arXiv id formats
+    const rawId = String(item?.id || "").trim();
+    if (!rawId) return { view: null, pdf: null };
+
+    // Accept common forms: "2006.04515", "2006.04515v2", "arXiv:2006.04515", "arXiv:2006.04515v2"
+    const arxivMatch =
+      rawId.match(/^arXiv:(?<core>\d{4}\.\d{4,5}(v\d+)?)$/i) ||
+      rawId.match(/^(?<core>\d{4}\.\d{4,5}(v\d+)?)$/);
+
+    if (arxivMatch?.groups?.core) {
+      const core = arxivMatch.groups.core;
+      return {
+        view: `https://arxiv.org/abs/${core}`,
+        pdf: `https://arxiv.org/pdf/${core}.pdf`,
+      };
+    }
+
+    return { view: null, pdf: null };
+  }, [item?.id, item?.url]);
+
   const formattedDate = useMemo(() => {
     if (!item?.update_date) return "-";
 
@@ -76,7 +103,7 @@ function ResultItem({ item, variant = "list" }) {
   return (
     <article
       className={
-        "rounded-xl border p-4 shadow-sm transition-colors " +
+        "w-full rounded-xl border p-4 shadow-sm transition-colors " +
         (isHighlight
           ? "border-[#8DA399]/50 bg-[#8DA399]/10"
           : "border-[#E5E7EB] bg-white/70")
@@ -103,6 +130,28 @@ function ResultItem({ item, variant = "list" }) {
             </span>
           </p>
           <p className="text-xs text-[#6B7280]">{categoriesText}</p>
+          {externalUrls.view ? (
+            <div className="mt-2 flex justify-end gap-3">
+              <a
+                href={externalUrls.pdf || externalUrls.view}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-[#4F46E5] hover:underline"
+              >
+                원문 보기
+              </a>
+              {externalUrls.pdf && (
+                <a
+                  href={externalUrls.view}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-[#4F46E5]/80 hover:underline"
+                >
+                  초록
+                </a>
+              )}
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -111,6 +160,30 @@ function ResultItem({ item, variant = "list" }) {
           <p className="text-xs font-semibold tracking-wide text-[#8DA399]">
             Title
           </p>
+<<<<<<< HEAD
+          {externalUrls.pdf || externalUrls.view ? (
+            <a
+              href={externalUrls.pdf || externalUrls.view}
+              target="_blank"
+              rel="noreferrer"
+              className={
+                "mt-1 inline-block font-semibold text-[#374151] hover:underline " +
+                (isHighlight ? "text-base sm:text-lg" : "text-base")
+              }
+            >
+              {title}
+            </a>
+          ) : (
+            <h3
+              className={
+                "mt-1 font-semibold text-[#374151] " +
+                (isHighlight ? "text-base sm:text-lg" : "text-base")
+              }
+            >
+              {title}
+            </h3>
+          )}
+=======
           <h3
             className={
               "mt-1 font-semibold text-[#374151] " +
@@ -119,6 +192,7 @@ function ResultItem({ item, variant = "list" }) {
           >
             {title}
           </h3>
+>>>>>>> main
         </div>
 
         <div>
@@ -151,7 +225,7 @@ function HighlightList({ items }) {
         <p className="text-sm font-semibold text-[#355548]">Top 5</p>
         <p className="text-xs text-[#6B7280]">유사도 상위 5개 결과</p>
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="flex w-full flex-col gap-3">
         {items.map((item) => (
           <MemoResultItem key={item?.id} item={item} variant="highlight" />
         ))}

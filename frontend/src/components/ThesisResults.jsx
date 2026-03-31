@@ -52,7 +52,7 @@ function ResultItem({ item, variant = "list" }) {
     [item?.page_content],
   );
 
-<<<<<<< HEAD
+
   const externalUrls = useMemo(() => {
     // Prefer explicit URL if provided
     if (item?.url && typeof item.url === "string") {
@@ -79,8 +79,6 @@ function ResultItem({ item, variant = "list" }) {
     return { view: null, pdf: null };
   }, [item?.id, item?.url]);
 
-=======
->>>>>>> main
   const formattedDate = useMemo(() => {
     if (!item?.update_date) return "-";
 

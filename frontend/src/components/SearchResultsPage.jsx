@@ -3,10 +3,12 @@ import { Loader2 } from "lucide-react";
 import SearchBar from "./SearchBar";
 import ThesisResults from "./ThesisResults";
 import { searchPapers } from "../api/client";
+import findThesisLogoUrl from "../../img/FindThesisLogo.png";
 
 function SearchResultsPage({
   initialQuery,
   onSearch,
+  onLogoClick,
   prefetchedQuery = "",
   prefetchedResults = null,
 }) {
@@ -84,6 +86,22 @@ function SearchResultsPage({
       <section className="w-full max-w-5xl mx-auto">
         <div className="w-full">
           <SearchBar
+            leading={
+              <span className="flex shrink-0 items-center self-center">
+                <button
+                  type="button"
+                  onClick={onLogoClick}
+                  className="m-0 flex shrink-0 cursor-pointer border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8DA399]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#DBD3C7] rounded"
+                  aria-label="메인 페이지로 이동"
+                >
+                  <img
+                    src={findThesisLogoUrl}
+                    alt=""
+                    className="pointer-events-none h-[1.35rem] w-auto object-contain sm:h-[1.47rem]"
+                  />
+                </button>
+              </span>
+            }
             onSearch={handleSearch}
             initialQuery={currentQuery}
             fullWidth

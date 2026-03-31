@@ -9,6 +9,7 @@ function SearchBar({
   loading = false,
   apiError = null,
   onDismissApiError,
+  leading = null,
 }) {
   const id = useId();
   const [query, setQuery] = useState("");
@@ -41,8 +42,9 @@ function SearchBar({
     await onSearch?.(validation.queryForApi);
   };
 
+  const widthClamp = fullWidth ? "" : leading ? "" : "max-w-3xl";
   const innerBarClass =
-    `w-full ${fullWidth ? "" : "max-w-3xl"} rounded-full bg-[#FFFFFF] shadow-sm px-2 py-2 flex items-center gap-2 transition-shadow ` +
+    `w-full ${widthClamp} rounded-full bg-[#FFFFFF] shadow-sm px-2 py-2 flex items-center gap-2 transition-shadow ` +
     (loading
       ? "focus-within:ring-0"
       : "focus-within:ring-2 focus-within:ring-[#8DA399]/30 focus-within:ring-offset-2 focus-within:ring-offset-white");
@@ -58,7 +60,10 @@ function SearchBar({
         value={query}
         onChange={handleChange}
         placeholder="찾으시는 논문의 주제를 입력하세요..."
-        className="flex-1 bg-transparent text-[#374151] placeholder:text-[#8DA399] outline-none rounded-full px-4 py-2 text-base sm:text-lg"
+        className={
+          "flex-1 bg-transparent text-[#374151] placeholder:text-[#8DA399] outline-none rounded-full py-2 text-base sm:text-lg " +
+          (leading ? "pl-2 pr-3 sm:pl-3 sm:pr-4" : "px-4")
+        }
         aria-invalid={displayError ? "true" : "false"}
         aria-describedby={displayError ? `${id}-error` : undefined}
       />
@@ -79,7 +84,7 @@ function SearchBar({
 
   const barWrapper = loading ? (
     <div
-      className={`search-bar-rainbow-ring w-full ${fullWidth ? "" : "max-w-3xl"} shadow-sm rounded-full`}
+      className={`search-bar-rainbow-ring w-full ${widthClamp} shadow-sm rounded-full`}
     >
       <div className={innerBarClass}>{fields}</div>
     </div>
@@ -89,14 +94,28 @@ function SearchBar({
 
   return (
     <div className={`w-full flex flex-col items-center ${fullWidth ? "" : ""}`}>
-      <form onSubmit={handleSubmit} className="w-full flex justify-center">
-        {barWrapper}
+      <form
+        onSubmit={handleSubmit}
+        className={`w-full flex items-center ${
+          leading
+            ? "max-w-5xl gap-2 sm:gap-3"
+            : "justify-center"
+        }`}
+      >
+        {leading}
+        <div
+          className={
+            leading ? "min-w-0 flex-1" : "flex w-full justify-center"
+          }
+        >
+          {barWrapper}
+        </div>
       </form>
       {displayError ? (
         <p
           id={`${id}-error`}
           role="alert"
-          className={`mt-3 text-sm text-[#B91C1C] text-center px-2 ${fullWidth ? "w-full" : "max-w-3xl w-full"}`}
+          className={`mt-3 text-sm text-[#B91C1C] text-center px-2 ${fullWidth || leading ? "w-full" : "max-w-3xl w-full"}`}
         >
           {displayError}
         </p>

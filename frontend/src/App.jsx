@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import MainLayout from "./components/MainLayout";
 import SearchResultsPage from "./components/SearchResultsPage";
 import { searchPapers } from "./api/client";
@@ -63,11 +63,23 @@ export default function App() {
     return params.get("q") || "";
   }, [searchText]);
 
+  const handleLogoClick = useCallback(() => {
+    if (path === "/search") {
+      window.history.pushState({}, "", "/");
+      setPath("/");
+      setSearchText("");
+      setRouteState({});
+    } else {
+      window.location.reload();
+    }
+  }, [path]);
+
   if (path === "/search") {
     return (
       <SearchResultsPage
         initialQuery={queryFromUrl}
         onSearch={handleSearchNavigation}
+        onLogoClick={handleLogoClick}
         prefetchedQuery={routeState?.prefetchedQuery || ""}
         prefetchedResults={routeState?.prefetchedResults}
       />
@@ -77,6 +89,7 @@ export default function App() {
   return (
     <MainLayout
       onSearch={handleSearchNavigation}
+      onLogoClick={handleLogoClick}
       // backgroundImageUrl={thesisImageUrl}
       searchLoading={homeLoading}
       searchError={homeSearchError}

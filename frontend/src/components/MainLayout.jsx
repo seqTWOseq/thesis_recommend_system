@@ -4,6 +4,7 @@ import findThesisLogoUrl from "../../img/FindThesisLogo.png";
 
 function MainLayout({
   onSearch,
+  onLogoClick,
   backgroundImageUrl,
   children,
   searchLoading = false,
@@ -41,12 +42,19 @@ function MainLayout({
       {/* Search bar is anchored to the screen center (50vh boundary) */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-4">
         <div className="relative flex justify-center">
-          <h1 className="absolute -top-[74px] left-1/2 -translate-x-1/2 m-0">
-            <img
-              src={findThesisLogoUrl}
-              alt="Find Thesis"
-              className="block h-10 w-auto sm:h-12"
-            />
+          <h1 className="absolute -top-[86px] left-1/2 -translate-x-1/2 m-0 sm:-top-[94px]">
+            <button
+              type="button"
+              onClick={onLogoClick}
+              className="m-0 block cursor-pointer border-0 bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8DA399]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#DBD3C7] rounded-md"
+              aria-label="홈으로 이동 · 새로고침"
+            >
+              <img
+                src={findThesisLogoUrl}
+                alt=""
+                className="pointer-events-none block h-[3.25rem] w-auto sm:h-[3.9rem]"
+              />
+            </button>
           </h1>
           <SearchBar
             onSearch={onSearch}
